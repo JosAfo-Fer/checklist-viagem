@@ -1,0 +1,689 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Checklist de Viagem</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e3a5f);
+    color: white;
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    padding: 50px 20px 30px;
+}
+
+header h1 {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #cbd5e1;
+    font-size: 18px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+    backdrop-filter: blur(10px);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #38bdf8;
+    color: #062033;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #7dd3fc;
+}
+
+#resultado {
+    display: none;
+}
+
+.categoria {
+    margin-top: 25px;
+}
+
+.categoria h3 {
+    color: #7dd3fc;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 8px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    margin: 6px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+
+.item input {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+}
+
+.item.concluido {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.progresso {
+    background: #0f172a;
+    height: 18px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.barra {
+    background: #22c55e;
+    height: 100%;
+    width: 0%;
+    transition: 0.3s;
+}
+
+.contador {
+    text-align: center;
+    margin-top: 8px;
+    color: #cbd5e1;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<header>
+
+<h1>✈️ Checklist de Viagem</h1>
+
+<p>
+Descubra o que levar e não esqueça nada importante.
+</p>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="card">
+
+<h2>🧳 Monte sua viagem</h2>
+
+<label>
+Qual é o destino?
+</label>
+
+<input
+type="text"
+id="destino"
+placeholder="Ex: Rio de Janeiro"
+>
+
+
+<label>
+Tipo de viagem
+</label>
+
+<select id="tipo">
+
+<option value="praia">
+🏖️ Praia
+</option>
+
+<option value="cidade">
+🏙️ Cidade
+</option>
+
+<option value="campo">
+🌲 Campo / Natureza
+</option>
+
+<option value="negocios">
+💼 Trabalho
+</option>
+
+<option value="internacional">
+🌎 Internacional
+</option>
+
+</select>
+
+
+<label>
+Quantos dias?
+</label>
+
+<input
+type="number"
+id="dias"
+min="1"
+value="5"
+>
+
+
+<button onclick="montarChecklist()">
+✨ Montar minha checklist
+</button>
+
+</div>
+
+
+<div
+class="card"
+id="resultado"
+>
+
+<h2 id="tituloResultado">
+Sua checklist
+</h2>
+
+<p>
+Progresso da mala:
+</p>
+
+<div class="progresso">
+
+<div
+class="barra"
+id="barra"
+></div>
+
+</div>
+
+<div
+class="contador"
+id="contador"
+>
+0% concluído
+</div>
+
+
+<div id="lista"></div>
+
+
+<button onclick="window.print()">
+🖨️ Imprimir checklist
+</button>
+
+<button onclick="limparChecklist()">
+🔄 Refazer checklist
+</button>
+
+</div>
+
+
+</div>
+
+
+<footer>
+
+✈️ Boa viagem! Não esqueça de conferir documentos,
+reservas e regras do seu destino.
+
+</footer>
+
+
+<script>
+
+
+function montarChecklist() {
+
+let destino =
+document.getElementById("destino").value;
+
+let tipo =
+document.getElementById("tipo").value;
+
+let dias =
+parseInt(document.getElementById("dias").value);
+
+
+if (!destino) {
+
+destino = "sua viagem";
+
+}
+
+
+if (!dias || dias < 1) {
+
+dias = 1;
+
+}
+
+
+document.getElementById("resultado").style.display =
+"block";
+
+
+document.getElementById("tituloResultado").innerHTML =
+"🧳 Checklist para " + destino +
+" — " + dias + " dia(s)";
+
+
+let categorias = {
+
+
+"📄 Documentos": [
+
+"Documento de identificação",
+
+"Carteira de motorista",
+
+"Passagens / bilhetes",
+
+"Reservas de hotel",
+
+"Cartões e dinheiro",
+
+"Seguro viagem, se necessário"
+
+],
+
+
+"👕 Roupas": [
+
+"Roupas para o período da viagem",
+
+"Roupa íntima",
+
+"Meias",
+
+"Roupa para dormir",
+
+"Calçados confortáveis",
+
+"Casaco ou agasalho"
+
+],
+
+
+"🧼 Higiene": [
+
+"Escova de dentes",
+
+"Pasta de dentes",
+
+"Desodorante",
+
+"Shampoo",
+
+"Sabonete",
+
+"Protetor solar",
+
+"Medicamentos de uso pessoal"
+
+],
+
+
+"🔌 Eletrônicos": [
+
+"Celular",
+
+"Carregador",
+
+"Fone de ouvido",
+
+"Power bank",
+
+"Adaptador de tomada, se necessário"
+
+],
+
+
+"🎒 Extras": [
+
+"Mochila pequena",
+
+"Óculos de sol",
+
+"Garrafa de água",
+
+"Guarda-chuva",
+
+"Uma sacola para roupas sujas"
+
+]
+
+};
+
+
+/* PRAIA */
+
+if (tipo === "praia") {
+
+categorias["🏖️ Praia"] = [
+
+"Roupa de banho",
+
+"Toalha",
+
+"Chinelo",
+
+"Protetor solar",
+
+"Óculos de sol",
+
+"Boné ou chapéu",
+
+"Bolsa de praia"
+
+];
+
+}
+
+
+/* CIDADE */
+
+if (tipo === "cidade") {
+
+categorias["🏙️ Cidade"] = [
+
+"Tênis confortável",
+
+"Mochila para passeios",
+
+"Mapa ou aplicativo de mapas",
+
+"Óculos de sol",
+
+"Guarda-chuva"
+
+];
+
+}
+
+
+/* CAMPO */
+
+if (tipo === "campo") {
+
+categorias["🌲 Natureza"] = [
+
+"Calçado adequado para trilhas",
+
+"Repelente",
+
+"Lanterna",
+
+"Garrafa de água",
+
+"Protetor solar",
+
+"Roupa confortável",
+
+"Capa de chuva"
+
+];
+
+}
+
+
+/* NEGÓCIOS */
+
+if (tipo === "negocios") {
+
+categorias["💼 Trabalho"] = [
+
+"Notebook",
+
+"Carregador do notebook",
+
+"Documentos de trabalho",
+
+"Cartões de visita",
+
+"Roupas adequadas para reuniões",
+
+"Agenda ou caderno"
+
+];
+
+}
+
+
+/* INTERNACIONAL */
+
+if (tipo === "internacional") {
+
+categorias["🌎 Internacional"] = [
+
+"Passaporte",
+
+"Visto, se necessário",
+
+"Seguro viagem",
+
+"Comprovantes de reserva",
+
+"Cartão internacional",
+
+"Adaptador de tomada",
+
+"Documentos importantes"
+
+];
+
+}
+
+
+let lista =
+document.getElementById("lista");
+
+lista.innerHTML = "";
+
+
+for (let categoria in categorias) {
+
+let div =
+document.createElement("div");
+
+div.className = "categoria";
+
+
+let titulo =
+document.createElement("h3");
+
+titulo.innerText = categoria;
+
+div.appendChild(titulo);
+
+
+categorias[categoria].forEach(function(item) {
+
+let linha =
+document.createElement("label");
+
+linha.className = "item";
+
+
+let checkbox =
+document.createElement("input");
+
+checkbox.type = "checkbox";
+
+
+checkbox.onchange = function() {
+
+if (checkbox.checked) {
+
+linha.classList.add("concluido");
+
+} else {
+
+linha.classList.remove("concluido");
+
+}
+
+atualizarProgresso();
+
+};
+
+
+let texto =
+document.createElement("span");
+
+texto.innerText = item;
+
+
+linha.appendChild(checkbox);
+
+linha.appendChild(texto);
+
+div.appendChild(linha);
+
+});
+
+
+lista.appendChild(div);
+
+}
+
+
+atualizarProgresso();
+
+window.scrollTo({
+
+top: document.getElementById("resultado").offsetTop,
+
+behavior: "smooth"
+
+});
+
+}
+
+
+/* PROGRESSO */
+
+function atualizarProgresso() {
+
+let caixas =
+document.querySelectorAll(
+"#lista input[type='checkbox']"
+);
+
+let marcadas = 0;
+
+
+caixas.forEach(function(caixa) {
+
+if (caixa.checked) {
+
+marcadas++;
+
+}
+
+});
+
+
+let porcentagem = caixas.length === 0
+? 0
+: Math.round(
+(marcadas / caixas.length) * 100
+);
+
+
+document.getElementById("barra").style.width =
+porcentagem + "%";
+
+
+document.getElementById("contador").innerText =
+porcentagem + "% concluído";
+
+}
+
+
+/* LIMPAR */
+
+function limparChecklist() {
+
+document.getElementById("resultado").style.display =
+"none";
+
+document.getElementById("lista").innerHTML = "";
+
+document.getElementById("destino").value = "";
+
+document.getElementById("dias").value = 5;
+
+window.scrollTo({
+
+top: 0,
+
+behavior: "smooth"
+
+});
+
+}
+
+</script>
+
+
+</body>
+
+</html>
+```
